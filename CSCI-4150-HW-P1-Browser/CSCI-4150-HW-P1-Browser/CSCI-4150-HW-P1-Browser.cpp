@@ -1,180 +1,203 @@
-// CSCI-4150-HW-P1-Browser.cpp : Defines the entry point for the application.
-//
+/////////////////////////////////////////////////////////////////////////////
+// Name:        minimal.cpp
+// Purpose:     Minimal wxWidgets sample
+// Author:      Julian Smart
+// Modified by:
+// Created:     04/01/98
+// Copyright:   (c) Julian Smart
+// Licence:     wxWindows licence
+/////////////////////////////////////////////////////////////////////////////
 
-#include "framework.h"
-#include "CSCI-4150-HW-P1-Browser.h"
+// ============================================================================
+// declarations
+// ============================================================================
 
-#define MAX_LOADSTRING 100
+// ----------------------------------------------------------------------------
+// headers
+// ----------------------------------------------------------------------------
 
-// Global Variables:
-HINSTANCE hInst;                                // current instance
-WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
-WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
+// For compilers that support precompilation, includes "wx/wx.h".
+#include "wx/wxprec.h"
 
-// Forward declarations of functions included in this code module:
-ATOM                MyRegisterClass(HINSTANCE hInstance);
-BOOL                InitInstance(HINSTANCE, int);
-LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+// for all others, include the necessary headers (this file is usually all you
+// need because it includes almost all "standard" wxWidgets headers)
+#ifndef WX_PRECOMP
+#include "wx/wx.h"
+#endif
+
+// ----------------------------------------------------------------------------
+// resources
+// ----------------------------------------------------------------------------
+
+// the application icon (under Windows it is in resources and even
+// though we could still include the XPM here it would be unused)
+#ifndef wxHAS_IMAGES_IN_RESOURCES
+#include "../sample.xpm"
+#endif
+
+// ----------------------------------------------------------------------------
+// private classes
+// ----------------------------------------------------------------------------
+
+// Define a new application type, each program should derive a class from wxApp
+class MyApp : public wxApp
 {
-    UNREFERENCED_PARAMETER(hPrevInstance);
-    UNREFERENCED_PARAMETER(lpCmdLine);
+public:
+    // override base class virtuals
+    // ----------------------------
 
-    // TODO: Place code here.
+    // this one is called on application startup and is a good place for the app
+    // initialization (doing it here and not in the ctor allows to have an error
+    // return: if OnInit() returns false, the application terminates)
+    virtual bool OnInit() wxOVERRIDE;
+};
 
-    // Initialize global strings
-    LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-    LoadStringW(hInstance, IDC_CSCI4150HWP1BROWSER, szWindowClass, MAX_LOADSTRING);
-    MyRegisterClass(hInstance);
+// Define a new frame type: this is going to be our main frame
+class MyFrame : public wxFrame
+{
+public:
+    // ctor(s)
+    MyFrame(const wxString& title);
 
-    // Perform application initialization:
-    if (!InitInstance (hInstance, nCmdShow))
-    {
-        return FALSE;
-    }
+    // event handlers (these functions should _not_ be virtual)
+    void OnQuit(wxCommandEvent& event);
+    void OnAbout(wxCommandEvent& event);
 
-    HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_CSCI4150HWP1BROWSER));
+private:
+    // any class wishing to process wxWidgets events must use this macro
+    wxDECLARE_EVENT_TABLE();
+};
 
-    MSG msg;
+// ----------------------------------------------------------------------------
+// constants
+// ----------------------------------------------------------------------------
 
-    // Main message loop:
-    while (GetMessage(&msg, nullptr, 0, 0))
-    {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-        {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
-    }
+// IDs for the controls and the menu commands
+enum
+{
+    // menu items
+    Minimal_Quit = wxID_EXIT,
 
-    return (int) msg.wParam;
+    // it is important for the id corresponding to the "About" command to have
+    // this standard value as otherwise it won't be handled properly under Mac
+    // (where it is special and put into the "Apple" menu)
+    Minimal_About = wxID_ABOUT
+};
+
+// ----------------------------------------------------------------------------
+// event tables and other macros for wxWidgets
+// ----------------------------------------------------------------------------
+
+// the event tables connect the wxWidgets events with the functions (event
+// handlers) which process them. It can be also done at run-time, but for the
+// simple menu events like this the static method is much simpler.
+wxBEGIN_EVENT_TABLE(MyFrame, wxFrame)
+EVT_MENU(Minimal_Quit, MyFrame::OnQuit)
+EVT_MENU(Minimal_About, MyFrame::OnAbout)
+wxEND_EVENT_TABLE()
+
+// Create a new application object: this macro will allow wxWidgets to create
+// the application object during program execution (it's better than using a
+// static object for many reasons) and also implements the accessor function
+// wxGetApp() which will return the reference of the right type (i.e. MyApp and
+// not wxApp)
+wxIMPLEMENT_APP(MyApp);
+
+// ============================================================================
+// implementation
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// the application class
+// ----------------------------------------------------------------------------
+
+// 'Main program' equivalent: the program execution "starts" here
+bool MyApp::OnInit()
+{
+    // call the base class initialization method, currently it only parses a
+    // few common command-line options but it could be do more in the future
+    if (!wxApp::OnInit())
+        return false;
+
+    // create the main application window
+    MyFrame* frame = new MyFrame("Minimal wxWidgets App");
+
+    // and show it (the frames, unlike simple controls, are not shown when
+    // created initially)
+    frame->Show(true);
+
+    // success: wxApp::OnRun() will be called which will enter the main message
+    // loop and the application will run. If we returned false here, the
+    // application would exit immediately.
+    return true;
+}
+
+// ----------------------------------------------------------------------------
+// main frame
+// ----------------------------------------------------------------------------
+
+// frame constructor
+MyFrame::MyFrame(const wxString& title)
+    : wxFrame(NULL, wxID_ANY, title)
+{
+    // set the frame icon
+    SetIcon(wxICON(sample));
+
+#if wxUSE_MENUBAR
+    // create a menu bar
+    wxMenu* fileMenu = new wxMenu;
+
+    // the "About" item should be in the help menu
+    wxMenu* helpMenu = new wxMenu;
+    helpMenu->Append(Minimal_About, "&About\tF1", "Show about dialog");
+
+    fileMenu->Append(Minimal_Quit, "E&xit\tAlt-X", "Quit this program");
+
+    // now append the freshly created menu to the menu bar...
+    wxMenuBar* menuBar = new wxMenuBar();
+    menuBar->Append(fileMenu, "&File");
+    menuBar->Append(helpMenu, "&Help");
+
+    // ... and attach this menu bar to the frame
+    SetMenuBar(menuBar);
+#else // !wxUSE_MENUBAR
+    // If menus are not available add a button to access the about box
+    wxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
+    wxButton* aboutBtn = new wxButton(this, wxID_ANY, "About...");
+    aboutBtn->Bind(wxEVT_BUTTON, &MyFrame::OnAbout, this);
+    sizer->Add(aboutBtn, wxSizerFlags().Center());
+    SetSizer(sizer);
+#endif // wxUSE_MENUBAR/!wxUSE_MENUBAR
+
+#if wxUSE_STATUSBAR
+    // create a status bar just for fun (by default with 1 pane only)
+    CreateStatusBar(2);
+    SetStatusText("Welcome to wxWidgets!");
+#endif // wxUSE_STATUSBAR
 }
 
 
+// event handlers
 
-//
-//  FUNCTION: MyRegisterClass()
-//
-//  PURPOSE: Registers the window class.
-//
-ATOM MyRegisterClass(HINSTANCE hInstance)
+void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
-    WNDCLASSEXW wcex;
-
-    wcex.cbSize = sizeof(WNDCLASSEX);
-
-    wcex.style          = CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc    = WndProc;
-    wcex.cbClsExtra     = 0;
-    wcex.cbWndExtra     = 0;
-    wcex.hInstance      = hInstance;
-    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_CSCI4150HWP1BROWSER));
-    wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_CSCI4150HWP1BROWSER);
-    wcex.lpszClassName  = szWindowClass;
-    wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
-
-    return RegisterClassExW(&wcex);
+    // true is to force the frame to close
+    Close(true);
 }
 
-//
-//   FUNCTION: InitInstance(HINSTANCE, int)
-//
-//   PURPOSE: Saves instance handle and creates main window
-//
-//   COMMENTS:
-//
-//        In this function, we save the instance handle in a global variable and
-//        create and display the main program window.
-//
-BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
+void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 {
-   hInst = hInstance; // Store instance handle in our global variable
-
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
-
-   if (!hWnd)
-   {
-      return FALSE;
-   }
-
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
-
-   return TRUE;
-}
-
-//
-//  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
-//
-//  PURPOSE: Processes messages for the main window.
-//
-//  WM_COMMAND  - process the application menu
-//  WM_PAINT    - Paint the main window
-//  WM_DESTROY  - post a quit message and return
-//
-//
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    switch (message)
-    {
-    case WM_COMMAND:
-        {
-            int wmId = LOWORD(wParam);
-            // Parse the menu selections:
-            switch (wmId)
-            {
-            case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-                break;
-            case IDM_EXIT:
-                DestroyWindow(hWnd);
-                break;
-            default:
-                return DefWindowProc(hWnd, message, wParam, lParam);
-            }
-        }
-        break;
-    case WM_PAINT:
-        {
-            PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hWnd, &ps);
-            // TODO: Add any drawing code that uses hdc here...
-            EndPaint(hWnd, &ps);
-        }
-        break;
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        break;
-    default:
-        return DefWindowProc(hWnd, message, wParam, lParam);
-    }
-    return 0;
-}
-
-// Message handler for about box.
-INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    UNREFERENCED_PARAMETER(lParam);
-    switch (message)
-    {
-    case WM_INITDIALOG:
-        return (INT_PTR)TRUE;
-
-    case WM_COMMAND:
-        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-        {
-            EndDialog(hDlg, LOWORD(wParam));
-            return (INT_PTR)TRUE;
-        }
-        break;
-    }
-    return (INT_PTR)FALSE;
+    wxMessageBox(wxString::Format
+    (
+        "Welcome to %s!\n"
+        "\n"
+        "This is the minimal wxWidgets sample\n"
+        "running under %s.",
+        wxVERSION_STRING,
+        wxGetOsDescription()
+    ),
+        "About wxWidgets minimal sample",
+        wxOK | wxICON_INFORMATION,
+        this);
 }
