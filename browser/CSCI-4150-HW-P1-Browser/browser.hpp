@@ -10,11 +10,11 @@ const std::string keys =
 {
 	"{help h usage ?	|      | print this message								}"
 #ifdef _WIN32
-	"{rows r			|   0  | Max number of rows on screen					}"
-	"{cols c			|   0  | Max number of columns on screen				}"
+	"{rows r||			|   0  | Max number of rows on screen					}"
+	"{cols c||			|   0  | Max number of columns on screen				}"
 #else
-	"{rows r			| 720  | Max number of rows on screen					}"
-	"{cols c			|1280  | Max number of columns on screen				}"
+	"{rows r||			| 720  | Max number of rows on screen					}"
+	"{cols c||			|1280  | Max number of columns on screen				}"
 #endif
 	"{@directory		|<none>| Directory that contains the pictures to browse	}"
 };

@@ -28,7 +28,7 @@ int maxcols;	//!< Default max number of columns to show
 int maxrows;	//!< Default max number of rows to show
 
 
-cv::Mat GetSquareImage(const cv::Mat& img, int target_width, int target_height)
+cv::Mat maxRatioResize(const cv::Mat& img, int target_width, int target_height)
 {
 	double scale_width = float(target_width) / img.size().width;
 	double scale_height = float(target_height) / img.size().height;
@@ -58,11 +58,9 @@ cv::Mat GetSquareImage(const cv::Mat& img, int target_width, int target_height)
 
 uchar display(const cv::Mat& img)
 {
-	cv::Mat resized_img = GetSquareImage(img, maxcols, maxrows);
+	cv::Mat resized_img = maxRatioResize(img, maxcols, maxrows);
 	cv::imshow("Image Preview", resized_img);
-	std::cout << "Here" << std::endl;
-	uchar response = cv::waitKey(0);
-	std::cout << std::endl << response << std::endl;
+	uchar response = (uchar) cv::waitKey(0);
 	return (response);
 }
 
@@ -131,17 +129,15 @@ int main( int argc, const char ** argv )
 
 		// TODO:
 		// [x] Go through the vector one by one, files, and remove entries that are not images. 
-		// [ ] For each image, display it and pause the loop until user responds:
-		// [x]		Space or n key - Next Image
-		// [x]		p key - Previous Image
-		// [x]		q key - Stop Program
-		// [x] Display Image
+		// [x] For each image, display it and pause the loop until user responds:
+		// [x] Space or n key - Next Image
+		//		[x] p key - Previous Image
+		//		[x] q key - Stop Program
+		//		[x] Display Image
 		// [x] Display image info on console:
 		//			Name, Path, Size (Rows, Columns, Dimensions), Number of Pixels, File Size (Bytes)
 		// [x] Resize image based on input dimensions while perserving aspect ratio
 		// [x] Exception handling
-
-		
 
 		for (int i = 0; i < files.size(); i++)
 		{
@@ -157,18 +153,18 @@ int main( int argc, const char ** argv )
 				std::string filename;
 				filename = getFileName(files[i]);
 				std::cout << std::endl << "Image Information" << std::endl;
-				std::cout << std::right << std::setw(18) << "Name: " << std::left << filename << std::endl;
-				std::cout << std::right << std::setw(18) << "Filepath: " << std::left << files[i] << std::endl;
-				std::cout << std::right << std::setw(18) << "Image Width: " << std::left << img.size().width << " px" << std::endl;
-				std::cout << std::right << std::setw(18) << "Image Height: " << std::left << img.size().height << " px" << std::endl;
-				std::cout << std::right << std::setw(18) << "Image Dimensions: " << std::left << img.size().width << "px x " << img.size().height << "px" << std::endl;
-				std::cout << std::right << std::setw(18) << "Total Pixels: " << std::left << img.size().width * img.size().height << "px" << std::endl;
-				std::cout << std::right << std::setw(18) << "File Size (Bytes): " << std::left << img.total() * img.elemSize() << " B" << std::endl;
-				std::cout << std::right << std::setw(18) << "Index: " << std::left << i << " of " << files.size() << std::endl;
+				std::cout << std::right << std::setw(19) << "Name: " << std::left << filename << std::endl;
+				std::cout << std::right << std::setw(19) << "Filepath: " << std::left << files[i] << std::endl;
+				std::cout << std::right << std::setw(19) << "Image Width: " << std::left << img.size().width << "px" << std::endl;
+				std::cout << std::right << std::setw(19) << "Image Height: " << std::left << img.size().height << "px" << std::endl;
+				std::cout << std::right << std::setw(19) << "Image Dimensions: " << std::left << img.size().width << "px x " << img.size().height << "px" << std::endl;
+				std::cout << std::right << std::setw(19) << "Total Pixels: " << std::left << img.size().width * img.size().height << "px" << std::endl;
+				std::cout << std::right << std::setw(19) << "File Size (Bytes): " << std::left << img.total() * img.elemSize() << "B" << std::endl;
+
 				
 				PROMPT:
 				{
-					std::cout << std::endl << "Awaiting User Response..." << std::endl;
+					std::cout << std::endl << "Awaiting User Response in Image Preview Window..." << std::endl;
 					if (i == files.size() - 1)
 					{
 						std::cout << "Press Space, the N key, or the Q key to go to end the application." << std::endl;
@@ -200,19 +196,24 @@ int main( int argc, const char ** argv )
 					}
 					else if (command == 'q' || command == 'Q')
 					{
-						std::cout << "Application closed." << std::endl << std::endl;
+						std::cout << std::endl << "Application closed." << std::endl << std::endl;
 						cv::destroyAllWindows();
 						return(0);
 					}
 					else
 					{
-						std::cout << std::endl << "INVALID KEY." << std::endl;
+						std::cout << std::endl << "INVALID KEY, TRY AGAIN." << std::endl;
 						goto PROMPT;
 					}
 
 					cv::destroyAllWindows();
 
 				}
+			}
+			else {
+				files.erase(files.begin() + i);
+				files.resize(files.size());
+				i = i-1;
 			}
 		}
 	}
