@@ -147,21 +147,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Partial Solution Files\browser.hpp" />
-    <ClInclude Include="..\..\Partial Solution Files\dir.hpp" />
-    <ClInclude Include="..\..\Partial Solution Files\dirent.h" />
+    <ClInclude Include="browser.hpp" />
+    <ClInclude Include="dir.hpp" />
+    <ClInclude Include="dirent.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Partial Solution Files\browser.cpp" />
-    <ClCompile Include="..\..\Partial Solution Files\dir.cpp" />
+    <ClCompile Include="browser.cpp" />
+    <ClCompile Include="dir.cpp" />
     <ClCompile Include="CSCI-4150-HW-P1-Browser.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\..\Partial Solution Files\CMakeLists.txt" />
+    <Text Include="CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\Partial Solution Files\CMakeSettings.json" />
+    <None Include="CMakeSettings.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

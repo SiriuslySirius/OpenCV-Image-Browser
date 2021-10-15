@@ -18,13 +18,13 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Partial Solution Files\browser.hpp">
+    <ClInclude Include="browser.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Partial Solution Files\dir.hpp">
+    <ClInclude Include="dir.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Partial Solution Files\dirent.h">
+    <ClInclude Include="dirent.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -32,20 +32,20 @@
     <ClCompile Include="CSCI-4150-HW-P1-Browser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Partial Solution Files\browser.cpp">
+    <ClCompile Include="browser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Partial Solution Files\dir.cpp">
+    <ClCompile Include="dir.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\..\Partial Solution Files\CMakeLists.txt">
+    <Text Include="CMakeLists.txt">
       <Filter>Source Files</Filter>
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\Partial Solution Files\CMakeSettings.json">
+    <None Include="CMakeSettings.json">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
