@@ -28,6 +28,24 @@ int maxcols;	//!< Default max number of columns to show
 int maxrows;	//!< Default max number of rows to show
 
 
+cv::Mat GetSquareImage(const cv::Mat& img, int target_width, int target_height)
+{
+	double scale_width = float(target_width) / img.size().width;
+	double scale_height = float(target_height) / img.size().height;
+
+	cv::Mat newIMG;
+
+	if (scale_width <= scale_height)
+	{
+		cv::resize(img, newIMG, cv::Size(0, 0), scale_width, scale_width);
+	}
+	else {
+		cv::resize(img, newIMG, cv::Size(0, 0), scale_height, scale_height);
+	}
+
+	return newIMG;
+}
+
 /******************************************************************************
  * \brief Display the specified image.
  *
@@ -40,15 +58,19 @@ int maxrows;	//!< Default max number of rows to show
 
 uchar display(const cv::Mat& img)
 {
-	// To Do
-	uchar response = 'c';
+	cv::Mat resized_img = GetSquareImage(img, maxcols, maxrows);
+	cv::imshow("Image Preview", resized_img);
+	std::cout << "Here" << std::endl;
+	uchar response = cv::waitKey(0);
+	std::cout << std::endl << response << std::endl;
 	return (response);
 }
+
 
 /*
  * Get File Name from a Path with or without extension
  */
-std::string getFileName(std::string filePath, bool withExtension = true, char seperator = '/')
+std::string getFileName(std::string filePath, bool withExtension = true, char seperator = '\\')
 {
 	// Get last dot position
 	std::size_t dotPos = filePath.rfind('.');
@@ -65,6 +87,8 @@ int main( int argc, const char ** argv )
 {
 	try
 	{
+		cv::namedWindow("Image Preview", cv::WINDOW_AUTOSIZE);
+
 		// parse the command line arguments
 
 		cv::CommandLineParser parser(argc, argv, keys);
@@ -107,17 +131,17 @@ int main( int argc, const char ** argv )
 
 		// TODO:
 		// [x] Go through the vector one by one, files, and remove entries that are not images. 
-		// [x] For each image, display it and pause the loop until user responds:
+		// [ ] For each image, display it and pause the loop until user responds:
 		// [x]		Space or n key - Next Image
 		// [x]		p key - Previous Image
 		// [x]		q key - Stop Program
 		// [x] Display Image
-		// [ ] Display image info on console:
+		// [x] Display image info on console:
 		//			Name, Path, Size (Rows, Columns, Dimensions), Number of Pixels, File Size (Bytes)
-		// [ ] Resize image based on input dimensions while perserving aspect ratio
+		// [x] Resize image based on input dimensions while perserving aspect ratio
 		// [x] Exception handling
 
-		cv::namedWindow("Browser", cv::WINDOW_AUTOSIZE);
+		
 
 		for (int i = 0; i < files.size(); i++)
 		{
@@ -126,17 +150,24 @@ int main( int argc, const char ** argv )
 				std::cout << std::right << std::setw(3) << i << ". " << std::left << std::setw(60) << files[i];
 				std::cout << std::endl;
 			*/
-	
 
 			cv::Mat img = cv::imread(files[i]);
 			if (!img.empty())
 			{
-			PROMPT:
+				std::string filename;
+				filename = getFileName(files[i]);
+				std::cout << std::endl << "Image Information" << std::endl;
+				std::cout << std::right << std::setw(18) << "Name: " << std::left << filename << std::endl;
+				std::cout << std::right << std::setw(18) << "Filepath: " << std::left << files[i] << std::endl;
+				std::cout << std::right << std::setw(18) << "Image Width: " << std::left << img.size().width << " px" << std::endl;
+				std::cout << std::right << std::setw(18) << "Image Height: " << std::left << img.size().height << " px" << std::endl;
+				std::cout << std::right << std::setw(18) << "Image Dimensions: " << std::left << img.size().width << "px x " << img.size().height << "px" << std::endl;
+				std::cout << std::right << std::setw(18) << "Total Pixels: " << std::left << img.size().width * img.size().height << "px" << std::endl;
+				std::cout << std::right << std::setw(18) << "File Size (Bytes): " << std::left << img.total() * img.elemSize() << " B" << std::endl;
+				std::cout << std::right << std::setw(18) << "Index: " << std::left << i << " of " << files.size() << std::endl;
+				
+				PROMPT:
 				{
-					std::string filename = getFileName(files[i]);
-					cv::imshow("Browser", img); // Move to display function with resize and aspect preserved ration.
-					cv::waitKey(1);
-
 					std::cout << std::endl << "Awaiting User Response..." << std::endl;
 					if (i == files.size() - 1)
 					{
@@ -155,8 +186,8 @@ int main( int argc, const char ** argv )
 						std::cout << "Press the Q key go to quit the application." << std::endl;
 					}
 
-					char command = ' ';
-					command = _getch();
+					uchar command = ' ';
+					command = display(img);
 
 
 					if (command == 'n' || command == 'N' || command == ' ' && i != files.size() - 1)
@@ -170,7 +201,7 @@ int main( int argc, const char ** argv )
 					else if (command == 'q' || command == 'Q')
 					{
 						std::cout << "Application closed." << std::endl << std::endl;
-						cv::destroyWindow("Browser");
+						cv::destroyAllWindows();
 						return(0);
 					}
 					else
@@ -178,13 +209,11 @@ int main( int argc, const char ** argv )
 						std::cout << std::endl << "INVALID KEY." << std::endl;
 						goto PROMPT;
 					}
-					
+
+					cv::destroyAllWindows();
+
 				}
 			}
-			else {
-				files.erase(files.begin() + i);
-			}
-			
 		}
 	}
 	catch (std::string& str)	// handle string exception
@@ -197,6 +226,6 @@ int main( int argc, const char ** argv )
 		std::cerr << "Error: " << argv[0] << ": " << e.msg << std::endl;
 		return (1);
 	}
-	cv::destroyWindow("Browser");
+	cv::destroyWindow("Image Preview");
 	return (0);
 }
