@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <conio.h>
 #include <vector>
 #include <assert.h>
 #include <opencv2/core.hpp>
@@ -42,6 +43,21 @@ uchar display(const cv::Mat& img)
 	// To Do
 	uchar response = 'c';
 	return (response);
+}
+
+/*
+ * Get File Name from a Path with or without extension
+ */
+std::string getFileName(std::string filePath, bool withExtension = true, char seperator = '/')
+{
+	// Get last dot position
+	std::size_t dotPos = filePath.rfind('.');
+	std::size_t sepPos = filePath.rfind(seperator);
+	if (sepPos != std::string::npos)
+	{
+		return filePath.substr(sepPos + 1, filePath.size() - (withExtension || dotPos != std::string::npos ? 1 : dotPos));
+	}
+	return "";
 }
 
 
@@ -89,14 +105,86 @@ int main( int argc, const char ** argv )
 
 		assert(files.size() != 0);	// ensure that the list of files is not empty
 
+		// TODO:
+		// [x] Go through the vector one by one, files, and remove entries that are not images. 
+		// [x] For each image, display it and pause the loop until user responds:
+		// [x]		Space or n key - Next Image
+		// [x]		p key - Previous Image
+		// [x]		q key - Stop Program
+		// [x] Display Image
+		// [ ] Display image info on console:
+		//			Name, Path, Size (Rows, Columns, Dimensions), Number of Pixels, File Size (Bytes)
+		// [ ] Resize image based on input dimensions while perserving aspect ratio
+		// [x] Exception handling
 
-		// display file names in the list
+		cv::namedWindow("Browser", cv::WINDOW_AUTOSIZE);
 
 		for (int i = 0; i < files.size(); i++)
 		{
-			std::cout << std::endl;
-			std::cout << std::setw(3) << i << ". " << std::setw(60) << files[i];
-			std::cout << std::endl;
+			/*
+				std::cout << std::endl;
+				std::cout << std::right << std::setw(3) << i << ". " << std::left << std::setw(60) << files[i];
+				std::cout << std::endl;
+			*/
+	
+
+			cv::Mat img = cv::imread(files[i]);
+			if (!img.empty())
+			{
+			PROMPT:
+				{
+					std::string filename = getFileName(files[i]);
+					cv::imshow("Browser", img); // Move to display function with resize and aspect preserved ration.
+					cv::waitKey(1);
+
+					std::cout << std::endl << "Awaiting User Response..." << std::endl;
+					if (i == files.size() - 1)
+					{
+						std::cout << "Press Space, the N key, or the Q key to go to end the application." << std::endl;
+					}
+					if (i != files.size() - 1)
+					{
+						std::cout << "Press Space or the N key to go to the next image." << std::endl;
+					}
+					if (i != 0)
+					{
+						std::cout << "Press the P key go to the previous image." << std::endl;
+					}
+					if (i != files.size() - 1)
+					{
+						std::cout << "Press the Q key go to quit the application." << std::endl;
+					}
+
+					char command = ' ';
+					command = _getch();
+
+
+					if (command == 'n' || command == 'N' || command == ' ' && i != files.size() - 1)
+					{
+						continue;
+					}
+					else if (i != 0 && command == 'p' || command == 'P')
+					{
+						i -= 2;
+					}
+					else if (command == 'q' || command == 'Q')
+					{
+						std::cout << "Application closed." << std::endl << std::endl;
+						cv::destroyWindow("Browser");
+						return(0);
+					}
+					else
+					{
+						std::cout << std::endl << "INVALID KEY." << std::endl;
+						goto PROMPT;
+					}
+					
+				}
+			}
+			else {
+				files.erase(files.begin() + i);
+			}
+			
 		}
 	}
 	catch (std::string& str)	// handle string exception
@@ -109,6 +197,6 @@ int main( int argc, const char ** argv )
 		std::cerr << "Error: " << argv[0] << ": " << e.msg << std::endl;
 		return (1);
 	}
-
+	cv::destroyWindow("Browser");
 	return (0);
 }
