@@ -27,6 +27,18 @@
 int maxcols;	//!< Default max number of columns to show
 int maxrows;	//!< Default max number of rows to show
 
+/******************************************************************************
+ * \scales images to fit the target size while maintaining image aspect ratio.
+ *
+ * Rescales the image specified in the argument to fit the specified target
+ * width and height given in the argument while maintaining the original
+ * image's aspect ratio.
+ *
+ * @param [in] Image to be rescaled
+ * @param [in] Target width to consider for rescaling
+ * @param [in] Target height to consider for rescaling
+ * \return Rescaled image.
+ *****************************************************************************/
 
 cv::Mat maxRatioResize(const cv::Mat& img, int target_width, int target_height)
 {
@@ -50,7 +62,8 @@ cv::Mat maxRatioResize(const cv::Mat& img, int target_width, int target_height)
  * \brief Display the specified image.
  *
  * Display the image specified in the argument.  This function ensures that the
- * image will fit in the windows, while maintaining the aspect ratio.
+ * image will fit within the window max size restriction provided by the user,
+ * while maintaining the aspect ratio of the image.
  *
  * @param [in] Image to be displayed
  * \return Key pressed by the user
@@ -58,8 +71,16 @@ cv::Mat maxRatioResize(const cv::Mat& img, int target_width, int target_height)
 
 uchar display(const cv::Mat& img)
 {
-	cv::Mat resized_img = maxRatioResize(img, maxcols, maxrows);
-	cv::imshow("Image Preview", resized_img);
+	// If image is larger than the max window size limit
+	if (img.size().width > maxcols || img.size().height > maxrows)
+	{
+		cv::Mat resized_img = maxRatioResize(img, maxcols, maxrows);
+		cv::imshow("Image Preview", resized_img);
+	}
+	else
+	{
+		cv::imshow("Image Preview", img);
+	}
 	uchar response = (uchar) cv::waitKey(0);
 	return (response);
 }
@@ -85,8 +106,6 @@ int main( int argc, const char ** argv )
 {
 	try
 	{
-		cv::namedWindow("Image Preview", cv::WINDOW_AUTOSIZE);
-
 		// parse the command line arguments
 
 		cv::CommandLineParser parser(argc, argv, keys);
@@ -127,33 +146,24 @@ int main( int argc, const char ** argv )
 
 		assert(files.size() != 0);	// ensure that the list of files is not empty
 
-		// TODO:
-		// [x] Go through the vector one by one, files, and remove entries that are not images. 
-		// [x] For each image, display it and pause the loop until user responds:
-		// [x] Space or n key - Next Image
-		//		[x] p key - Previous Image
-		//		[x] q key - Stop Program
-		//		[x] Display Image
-		// [x] Display image info on console:
-		//			Name, Path, Size (Rows, Columns, Dimensions), Number of Pixels, File Size (Bytes)
-		// [x] Resize image based on input dimensions while perserving aspect ratio
-		// [x] Exception handling
-
+		// Loops through the emtire list of files from the given directory and it's subdirectories
 		for (int i = 0; i < files.size(); i++)
 		{
-			/*
-				std::cout << std::endl;
-				std::cout << std::right << std::setw(3) << i << ". " << std::left << std::setw(60) << files[i];
-				std::cout << std::endl;
-			*/
-
+			// Reads the files
 			cv::Mat img = cv::imread(files[i]);
+
+			// if image is not empty, prompt in the console the current image's information and
+			// navigation instructions for traversing the images in the list of files
 			if (!img.empty())
 			{
-				std::string filename;
-				filename = getFileName(files[i]);
-				std::cout << std::endl << "Image Information" << std::endl;
-				std::cout << std::right << std::setw(19) << "Name: " << std::left << filename << std::endl;
+				// Create an OpenCV window to for previewing the image.
+				cv::namedWindow("Image Preview", cv::WINDOW_AUTOSIZE);
+
+				// Prompt current image information.
+				std::string filename = getFileName(files[i]);
+				std::cout << std::endl << "IMAGE INFORMATION" << std::endl;
+				std::cout << std::right << std::setw(19) << "Name: " << std::left << filename.substr(0, filename.find(".")) << std::endl;
+				std::cout << std::right << std::setw(19) << "File Type: " << std::left << filename.substr(filename.rfind('.') + 1) << std::endl;
 				std::cout << std::right << std::setw(19) << "Filepath: " << std::left << files[i] << std::endl;
 				std::cout << std::right << std::setw(19) << "Image Width: " << std::left << img.size().width << "px" << std::endl;
 				std::cout << std::right << std::setw(19) << "Image Height: " << std::left << img.size().height << "px" << std::endl;
@@ -161,60 +171,79 @@ int main( int argc, const char ** argv )
 				std::cout << std::right << std::setw(19) << "Total Pixels: " << std::left << img.size().width * img.size().height << "px" << std::endl;
 				std::cout << std::right << std::setw(19) << "File Size (Bytes): " << std::left << img.total() * img.elemSize() << "B" << std::endl;
 
-				
+				// Label to go back to when the user presses the wrong key.
 				PROMPT:
 				{
+					// Prompt controls for navigating the vector of file locations
 					std::cout << std::endl << "Awaiting User Response in Image Preview Window..." << std::endl;
-					if (i == files.size() - 1)
-					{
-						std::cout << "Press Space, the N key, or the Q key to go to end the application." << std::endl;
-					}
+					// Condition to prevent this message to display at the last file in the vector.
 					if (i != files.size() - 1)
 					{
 						std::cout << "Press Space or the N key to go to the next image." << std::endl;
 					}
+					// Condition to prevent this message at the beginning of the vector.
 					if (i != 0)
 					{
 						std::cout << "Press the P key go to the previous image." << std::endl;
 					}
+					// Condition to prevent this message to display at the last file in the vector.
 					if (i != files.size() - 1)
 					{
 						std::cout << "Press the Q key go to quit the application." << std::endl;
 					}
+					// Condition to show this message to only display at the last file in the vector.
+					if (i == files.size() - 1)
+					{
+						std::cout << "Press Space, the N key, or the Q key to go to end the application." << std::endl;
+					}
 
-					uchar command = ' ';
-					command = display(img);
+					// Get the user response and display image
+					 uchar command = display(img);
 
-
+					// Conditionals for user response to navigate the vector.
+					// Refer to comment for navigation instructions regarding index location conditions.
+					// Next
 					if (command == 'n' || command == 'N' || command == ' ' && i != files.size() - 1)
 					{
+						// Always destroy the window when you are done.
+						cv::destroyAllWindows();
 						continue;
 					}
+					// Previous
 					else if (i != 0 && command == 'p' || command == 'P')
 					{
 						i -= 2;
 					}
+					// Quit
 					else if (command == 'q' || command == 'Q')
 					{
 						std::cout << std::endl << "Application closed." << std::endl << std::endl;
+						// Always destroy the window when you are done.
 						cv::destroyAllWindows();
 						return(0);
 					}
+					// Handling invalid key input.
 					else
 					{
 						std::cout << std::endl << "INVALID KEY, TRY AGAIN." << std::endl;
 						goto PROMPT;
 					}
-
-					cv::destroyAllWindows();
-
 				}
+				// Always destroy the window when you are done.
+				cv::destroyAllWindows();
 			}
+			// If the file is empty, meaning it's not an image, delete the file location out of the
+			// vector, then resize the vector, and don't iterate to the next index in the next 
+			// iteration. This will take you to the next image by replacing the deleted file location
+			// with the file location of the next image.
 			else {
 				files.erase(files.begin() + i);
 				files.resize(files.size());
 				i = i-1;
 			}
+
+			// Always destroy the window when you are done.
+			cv::destroyAllWindows();
 		}
 	}
 	catch (std::string& str)	// handle string exception
@@ -227,6 +256,6 @@ int main( int argc, const char ** argv )
 		std::cerr << "Error: " << argv[0] << ": " << e.msg << std::endl;
 		return (1);
 	}
-	cv::destroyWindow("Image Preview");
+
 	return (0);
 }
