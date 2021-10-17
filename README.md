@@ -36,7 +36,7 @@ To run the program, open Terminal from the Launchpad menu and use the 'cd' comma
 
 * _Open help:_
   * .\browser.exe -h
-* _Run program __without__ image preview window size limit (will adjust to display size on Windows):_
+* _Run program __without__ image preview window size limit:_
   * .\browser.exe _Your-Directory-Path_
   * __Example:__ .\browser.exe "C:\Users\__Some User__\Desktop\directory-to-browse-images
 * _Run program __with__ image preview window size limit:_
