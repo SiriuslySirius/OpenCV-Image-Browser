@@ -25,7 +25,7 @@ To run the program, open Powershell and use the 'cd' command to "\*\browser\x64\
   * .\browser.exe -r=_Max-INT-Height-Limit-in-Pixels_ -c=_INT-Max-Width-Limit-Pixels_ _STRING-Your-Directory-Path_
   * __Example:__ .\browser.exe -r=720 -c=1280 'C:\Users\__Some User__\Desktop\directory-to-browse-images-from'
   
-## Instructions for MacOS
+## Instructions for MacOS with Xcode
 The instructions for running our application on MacOS are very similar to the Windows counterpart. The biggest exception being having to work through Xcode rather than Visual Studio 2019. To begin open 'browser.sln' and follow the instructions on how to install OpenCV on Mac with the following link: https://www.youtube.com/watch?v=HxNZEa7Slyk&t=571s
 
 The steps are mostly the same as above with Windows except for having to switch to a release mode rather than a debug one. Creating the build for the browser defaulty will do. 
