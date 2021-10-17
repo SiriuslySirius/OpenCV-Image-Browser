@@ -1,4 +1,11 @@
 /******************************************************************************
+
+ECU CSCI 4150 DIP/CV Fall 2021 Group Programming Assignment 1
+Contributors: Abelson Abueg and Brandon Miranda
+
+ *****************************************************************************/
+
+/******************************************************************************
  * \brief Image Browser using OpenCV
  *
  * This is a program to read and display images using OpenCV.  It displays all
