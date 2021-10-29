@@ -1,2 +1,2 @@
-.vs
-browser/CSCI-4150-HW-P1-Browser/CSCI-4150-HW-P1-Browser.vcxproj
+*.vs
+*.vcxproj*
