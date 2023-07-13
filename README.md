@@ -1,4 +1,4 @@
-# Image Browser
+# OpenCV Image Browser
 ECU CSCI 4150 DIP/CV Fall 2021 Group Programming Assignment <br/>
 Contributors: Abelson Abueg and Brandon Miranda
 
